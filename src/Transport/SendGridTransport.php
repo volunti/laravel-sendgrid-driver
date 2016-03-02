@@ -84,7 +84,7 @@ class SendgridTransport implements Swift_Transport
     {
         if ($from = $message->getTo()) {
             $data['to'] = array_keys($from);
-            $data['toname'] = $from;
+            $data['toname'] = array_values($from);
         }
     }
 
@@ -96,7 +96,7 @@ class SendgridTransport implements Swift_Transport
     {
         if ($cc = $message->getCc()) {
             $data['cc'] = array_keys($cc);
-            $data['ccname'] = $cc;
+            $data['ccname'] = array_values($cc);
         }
     }
 
@@ -108,7 +108,7 @@ class SendgridTransport implements Swift_Transport
     {
         if ($bcc = $message->getBcc()) {
             $data['bcc'] = array_keys($bcc);
-            $data['bccname'] = $bcc;
+            $data['bccname'] = array_values($bcc);
         }
     }
 
