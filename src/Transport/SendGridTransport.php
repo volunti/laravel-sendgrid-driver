@@ -5,12 +5,14 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Swift_Attachment;
 use Swift_Events_EventListener;
+use Swift_Image;
 use Swift_Mime_Message;
 use Swift_Transport;
 
 class SendgridTransport implements Swift_Transport
 {
     const MAXIMUM_FILE_SIZE = 7340032;
+    const SMTP_API_NAME = 'sendgrid/x-smtpapi';
 
     private $api_key;
 
@@ -61,6 +63,7 @@ class SendgridTransport implements Swift_Transport
         $this->setCc($data, $message);
         $this->setBcc($data, $message);
         $this->setAttachment($data, $message);
+        $this->setSmtpApi($data, $message);
 
         $options = [
             'headers' => ['Authorization' => 'Bearer ' . $this->api_key, 'Content-Type' => 'multipart/form-data']
@@ -127,6 +130,24 @@ class SendgridTransport implements Swift_Transport
             $handler = tmpfile();
             fwrite($handler, $attachment->getBody());
             $data['files[' . $attachment->getFilename() . ']'] = $handler;
+        }
+    }
+
+    /**
+     * Set Sendgrid SMTP API
+     *
+     * @param $data
+     * @param Swift_Mime_Message $message
+     */
+    protected function setSmtpApi(&$data, Swift_Mime_Message $message)
+    {
+        foreach ($message->getChildren() as $attachment) {
+            if (!$attachment instanceof Swift_Image
+                || !in_array(self::SMTP_API_NAME, [$attachment->getFilename(), $attachment->getContentType()])
+            ) {
+                continue;
+            }
+            $data['x-smtpapi'] = json_encode($attachment->getBody());
         }
     }
 
