@@ -7,6 +7,7 @@ use Swift_Attachment;
 use Swift_Events_EventListener;
 use Swift_Image;
 use Swift_Mime_Message;
+use Swift_MimePart;
 use Swift_Transport;
 
 class SendgridTransport implements Swift_Transport
@@ -62,6 +63,7 @@ class SendgridTransport implements Swift_Transport
         $this->setTo($data, $message);
         $this->setCc($data, $message);
         $this->setBcc($data, $message);
+        $this->setText($data, $message);
         $this->setAttachment($data, $message);
         $this->setSmtpApi($data, $message);
 
@@ -112,6 +114,22 @@ class SendgridTransport implements Swift_Transport
         if ($bcc = $message->getBcc()) {
             $data['bcc'] = array_keys($bcc);
             $data['bccname'] = array_values($bcc);
+        }
+    }
+
+    /**
+     * Set text contents.
+     *
+     * @param $data
+     * @param Swift_Mime_Message $message
+     */
+    protected function setText(&$data, Swift_Mime_Message $message)
+    {
+        foreach ($message->getChildren() as $attachment) {
+            if (!$attachment instanceof Swift_MimePart) {
+                continue;
+            }
+            $data['text'] = $attachment->getBody();
         }
     }
 
