@@ -1,5 +1,5 @@
 {
-    "name": "s-ichikawa/laravel-sendgrid-driver",
+    "name": "volunti/laravel-sendgrid-driver",
     "description": "This liblary can add sendgrid driver into the laravel's mail configure.",
     "license": "MIT",
     "require": {
